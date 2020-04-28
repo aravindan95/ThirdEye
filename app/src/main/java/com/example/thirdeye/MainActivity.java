@@ -3,6 +3,7 @@ package com.example.thirdeye;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
@@ -48,6 +49,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import com.example.thirdeye.SpeechTool;
 
 import org.tensorflow.lite.Interpreter;
 
@@ -322,6 +324,9 @@ public class MainActivity extends AppCompatActivity {
             Log.i("Score 1",""+resultArray[0][0][2]*100);
             Log.i("Score 2",""+resultArray[0][1][2]*100);
             Log.i("Score 3",""+resultArray[0][2][2]*100);
+            Intent intent = new Intent(this, SpeechTool.class);
+            intent.putExtra("text", "Hello I am ready");
+            startActivity(intent);
         } catch(IOException e){
             e.printStackTrace();
         }
