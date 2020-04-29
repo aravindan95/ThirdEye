@@ -9,6 +9,7 @@ import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
+import android.graphics.Matrix;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
@@ -49,6 +50,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import com.example.thirdeye.SpeechTool;
 
 import org.tensorflow.lite.Interpreter;
@@ -152,8 +154,14 @@ public class MainActivity extends AppCompatActivity {
                         byteBuffer.get(bytes);
                         save(bytes);
                         Bitmap img = BitmapFactory.decodeFile(""+file);
-                        Bitmap.createScaledBitmap(img, 150, 150, true);
-                        ByteBuffer buffer = convertBitmapToByteBuffer(img);
+                        Matrix matrix = new Matrix();
+                        matrix.postRotate(90);
+                        Bitmap scaledBitmap = Bitmap.createScaledBitmap(img, 150, 150, true);
+                        Bitmap rotatedBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
+                        File file1 = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES) +"/"+ UUID.randomUUID() +".jpg");
+                        OutputStream output = new FileOutputStream(file1);
+                        rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100,output);
+                        ByteBuffer buffer = convertBitmapToByteBuffer(rotatedBitmap);
                         runModel(buffer);
                     }
                     catch (Exception e)
@@ -325,7 +333,7 @@ public class MainActivity extends AppCompatActivity {
             Log.i("Score 2",""+resultArray[0][1][2]*100);
             Log.i("Score 3",""+resultArray[0][2][2]*100);
             Intent intent = new Intent(this, SpeechTool.class);
-            intent.putExtra("text", "Hello I am ready");
+            intent.putExtra("text", ""+resultArray[0][0][1]);
             startActivity(intent);
         } catch(IOException e){
             e.printStackTrace();
